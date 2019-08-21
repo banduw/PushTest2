@@ -13,6 +13,7 @@ import UserNotifications
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var vc: ViewController?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -35,6 +36,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         })
         
         if let notification = launchOptions?[UIApplication.LaunchOptionsKey.remoteNotification] as? [String: AnyObject] {
+            if let vc = vc {
+                vc.payloadField.text = String(describing: notification)
+            }
             print("notification at launch = \(notification)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: {
                 let msgController = UIAlertController(title: "Push", message: "Received", preferredStyle: .alert)
@@ -49,6 +53,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let token = tokenParts.joined()
+        if let vc = vc {
+            vc.tokenField.text = token
+        }
         print("Device Token: \(token)")
     }
     
@@ -61,6 +68,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("no notification data")
             completionHandler(.failed)
             return
+        }
+        if let vc = vc {
+            vc.payloadField.text = String(describing: notification)
         }
         print("notification while running = \(notification)")
         completionHandler(.newData)
